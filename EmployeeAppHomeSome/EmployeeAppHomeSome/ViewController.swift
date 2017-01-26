@@ -16,23 +16,10 @@ class ViewController: UIViewController {
     var orderList:Array<DummyData> = Array()
     var skippedItems: Array<DummyData> = Array()
     var data:DummyData? = nil
-    var validateQuantity:String? = ""
 
     @IBOutlet weak var groceryName: UILabel!
     @IBOutlet weak var groceryQuantity: UILabel!
    
-    @IBAction func doneTapped(_ sender: Any) {
-      
-       showAlertViewWithController()
-       //updateOrderList()
-    }
-    
-    
-    @IBAction func skipTapped(_ sender: Any) {
-        skippedItems.append(updateOrderList())
-       
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -60,10 +47,24 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    // Done button tapped
+    @IBAction func doneTapped(_ sender: Any) {
+        
+        showAlertViewWithController()
+    }
+    
+    // Skip Button tapped
+    @IBAction func skipTapped(_ sender: Any) {
+        skippedItems.append(updateOrderList()!)
+        
+    }
+
+    
     func randQuantity (lower: UInt32 , upper: UInt32) -> String {
         return String( lower + arc4random_uniform(upper - lower + 1))
     }
     
+    // TODO: Remove after adding API end point to get data
     func genRandomString() -> String {
         
         let charactersString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -78,6 +79,7 @@ class ViewController: UIViewController {
     
     }
 
+    // TODO:Change to API end pt which populates the ordersList
     func createData() {
         
         for _ in 0..<10 {
@@ -85,30 +87,36 @@ class ViewController: UIViewController {
         }
     }
     
-    func updateOrderList() -> DummyData {
-        var item = orderList.remove(at: 0)
+    // function to update orderlist array
+    // set the labels
+    func updateOrderList() -> DummyData? {
+        
+        if(!orderList.isEmpty) {
+        let item = orderList.remove(at: 0)
         self.groceryName.text = orderList[0].itemName
         self.groceryQuantity.text = orderList[0].quantity
         return item
-        
+        }
+        return nil
     }
     
-    func showAlertViewWithController() {
+    // func to show alertcontroller asking user to validate entered quantity
+    func showAlertViewWithController(inputMessage:String = "Please input your Quantity:") {
         
-        let alertController = UIAlertController(title: "Quantity?", message: "Please input your Quantity:", preferredStyle: .alert)
+        let alertController = UIAlertController(title: "Quantity?", message: inputMessage, preferredStyle: .alert)
+            //"Please input your Quantity:", preferredStyle: .alert)
         
         let confirmAction = UIAlertAction(title: "Confirm", style: .default) { (_) in
             if let field = alertController.textFields![0] as? UITextField {
                 // store your data
                  print (field.text)
                 if (field.text?.isEmpty == true || field.text != self.orderList[0].quantity) {
-                    self.showAlertViewWithController()
+                    self.showAlertViewWithController(inputMessage: "Recheck the Quantity and Enter again")
                 }
                 else {
                     
                     print ("Entered number: " + field.text!)
                     self.updateOrderList()
-                    //self.validateQuantity = field.text
                 }
                
 //                UserDefaults.standard.set(field.text, forKey: "userEmail")
@@ -119,7 +127,7 @@ class ViewController: UIViewController {
             }
         }
         
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
+        _ = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
         
         alertController.addTextField { (textField) in
             textField.placeholder = "Quantity"
