@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+// Login ViewController class 
 class LoginViewController: UIViewController {
     @IBAction func loginTapped(_ sender: Any) {
         self.performSegue(withIdentifier: "SuccessfulLogin", sender: self)
